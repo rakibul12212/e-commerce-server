@@ -2,8 +2,16 @@
 
 ## Base URL
 
+**Development:**
+
 ```
 http://localhost:5000
+```
+
+**Production (Vercel):**
+
+```
+https://e-commerce-server-swart.vercel.app
 ```
 
 ## 🚀 Server Endpoints
