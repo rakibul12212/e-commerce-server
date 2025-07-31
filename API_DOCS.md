@@ -45,7 +45,7 @@ https://e-commerce-server-swart.vercel.app
 - `sort` - Sort field (default: createdAt)
 - `order` - Sort order: asc/desc (default: desc)
 - `page` - Page number (default: 1)
-- `limit` - Items per page (default: 12)
+- `limit` - Items per page (default:100)
 
 **Example:**
 

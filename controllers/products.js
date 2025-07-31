@@ -15,8 +15,6 @@ const getAllProducts = async (req, res) => {
       search,
       sort = "createdAt",
       order = "desc",
-      page = 1,
-      limit = 12,
     } = req.query;
 
     // Build filter object
@@ -50,30 +48,17 @@ const getAllProducts = async (req, res) => {
     const sortOptions = {};
     sortOptions[sort] = order === "desc" ? -1 : 1;
 
-    // Calculate pagination
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-
     // Execute query
-    const allProducts = await Product.find(filter)
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(parseInt(limit));
+    const allProducts = await Product.find(filter).sort(sortOptions);
 
-    // Get total count for pagination
-    const totalProducts = await Product.countDocuments(filter);
-    const totalPages = Math.ceil(totalProducts / parseInt(limit));
+    // Get total count
+    const totalProducts = allProducts.length;
 
     res.status(200).json({
       success: true,
       message: "Products fetched successfully",
       data: allProducts,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages,
-        totalProducts,
-        hasNextPage: parseInt(page) < totalPages,
-        hasPrevPage: parseInt(page) > 1,
-      },
+      totalProducts,
       filters: {
         category,
         subCategory,
@@ -293,17 +278,8 @@ const getSubCategories = async (req, res) => {
 const getProductsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
-    const { limit = 12, page = 1 } = req.query;
-
-    const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const products = await Product.find({
-      category: category.toLowerCase(),
-    })
-      .limit(parseInt(limit))
-      .skip(skip);
-
-    const totalProducts = await Product.countDocuments({
       category: category.toLowerCase(),
     });
 
@@ -311,11 +287,7 @@ const getProductsByCategory = async (req, res) => {
       success: true,
       message: `Products in ${category} category fetched successfully`,
       data: products,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(totalProducts / parseInt(limit)),
-        totalProducts,
-      },
+      totalProducts: products.length,
     });
   } catch (error) {
     res.status(500).json({
