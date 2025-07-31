@@ -673,6 +673,168 @@ const products = [
       { size: "2XL", color: "Grey", stock: 6 },
     ],
   },
+  {
+    id: 21,
+    name: "Premium Gaming Headset",
+    shortDescription:
+      "High-quality wireless gaming headset with noise cancellation and RGB lighting.",
+    description: "Premium wireless gaming headset with advanced features.",
+    longDescription:
+      "Immerse yourself in gaming with this Premium Gaming Headset featuring advanced 7.1 surround sound, active noise cancellation, and customizable RGB lighting. Built with memory foam ear cushions and an adjustable headband for maximum comfort during extended gaming sessions. The wireless design offers freedom of movement with a 20-hour battery life and fast charging capability. Compatible with PC, PlayStation, Xbox, and mobile devices. The retractable microphone ensures crystal-clear communication with your team.",
+    price: 2500,
+    discount: 20,
+    discountedPrice: 2000.0,
+    category: "electronics",
+    subCategory: "gaming accessories",
+    isNewArrival: true,
+    hasDiscount: true,
+    flashSale: false,
+    stockQuantity: 25,
+    materials: ["Plastic", "Memory Foam", "Metal"],
+    images: {
+      primary: "https://i.ibb.co/B2TRtrZP/noimage.png",
+      detail: [
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+      ],
+    },
+    variants: [
+      { size: "Standard", color: "Black", stock: 10 },
+      { size: "Standard", color: "White", stock: 8 },
+      { size: "Standard", color: "RGB", stock: 7 },
+    ],
+  },
+  {
+    id: 22,
+    name: "Organic Cotton Baby Onesie Set",
+    shortDescription:
+      "Soft and breathable organic cotton onesies for babies, pack of 3.",
+    description: "Organic cotton baby onesie set for comfort and safety.",
+    longDescription:
+      "Keep your little one comfortable and safe with this Organic Cotton Baby Onesie Set. Made from 100% certified organic cotton that's gentle on sensitive baby skin. The set includes 3 onesies in different adorable patterns and colors. Features easy snap closures for quick diaper changes and reinforced seams for durability. The fabric is pre-shrunk and maintains its softness after multiple washes. Perfect for everyday wear, sleeping, or as a thoughtful baby shower gift.",
+    price: 1200,
+    discount: 0,
+    discountedPrice: 1200.0,
+    category: "baby",
+    subCategory: "clothing",
+    isNewArrival: true,
+    hasDiscount: false,
+    flashSale: false,
+    stockQuantity: 40,
+    materials: ["Organic Cotton"],
+    images: {
+      primary: "https://i.ibb.co/B2TRtrZP/noimage.png",
+      detail: [
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+      ],
+    },
+    variants: [
+      { size: "0-3M", color: "Pink", stock: 15 },
+      { size: "3-6M", color: "Blue", stock: 12 },
+      { size: "6-9M", color: "Yellow", stock: 8 },
+      { size: "9-12M", color: "Green", stock: 5 },
+    ],
+  },
+  {
+    id: 23,
+    name: "Professional Chef Knife Set",
+    shortDescription:
+      "High-carbon stainless steel knife set with wooden block, 8-piece collection.",
+    description: "Professional-grade chef knife set for culinary enthusiasts.",
+    longDescription:
+      "Elevate your culinary skills with this Professional Chef Knife Set, crafted from high-carbon stainless steel for exceptional sharpness and durability. The 8-piece set includes chef's knife, paring knife, utility knife, bread knife, carving knife, kitchen shears, honing steel, and elegant wooden storage block. Each knife features an ergonomic handle for comfortable grip and precise control. The blades maintain their edge longer and are easy to sharpen. Perfect for professional chefs and home cooking enthusiasts who demand quality and performance.",
+    price: 4500,
+    discount: 25,
+    discountedPrice: 3375.0,
+    category: "kitchen",
+    subCategory: "cookware",
+    isNewArrival: false,
+    hasDiscount: true,
+    flashSale: true,
+    stockQuantity: 15,
+    materials: ["Stainless Steel", "Wood", "Carbon Steel"],
+    images: {
+      primary: "https://i.ibb.co/B2TRtrZP/noimage.png",
+      detail: [
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+      ],
+    },
+    variants: [
+      { size: "8-Piece", color: "Silver", stock: 10 },
+      { size: "8-Piece", color: "Black Handle", stock: 5 },
+    ],
+  },
+  {
+    id: 24,
+    name: "Yoga Mat with Alignment Lines",
+    shortDescription:
+      "Non-slip premium yoga mat with alignment guides and carrying strap.",
+    description: "Premium yoga mat with alignment lines for perfect poses.",
+    longDescription:
+      "Achieve perfect alignment in your yoga practice with this Premium Yoga Mat featuring printed alignment lines and pose guides. Made from eco-friendly TPE material that provides excellent grip and cushioning while being kind to the environment. The 6mm thickness offers optimal support for joints while maintaining stability. The non-slip surface works on any floor type, and the mat is lightweight yet durable. Includes a convenient carrying strap and is easy to clean. Perfect for beginners learning proper alignment and experienced yogis maintaining their practice.",
+    price: 1800,
+    discount: 10,
+    discountedPrice: 1620.0,
+    category: "sports",
+    subCategory: "fitness",
+    isNewArrival: false,
+    hasDiscount: true,
+    flashSale: false,
+    stockQuantity: 30,
+    materials: ["TPE", "Natural Rubber"],
+    images: {
+      primary: "https://i.ibb.co/B2TRtrZP/noimage.png",
+      detail: [
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+      ],
+    },
+    variants: [
+      { size: "Standard", color: "Purple", stock: 10 },
+      { size: "Standard", color: "Teal", stock: 8 },
+      { size: "Standard", color: "Pink", stock: 7 },
+      { size: "Extra Long", color: "Blue", stock: 5 },
+    ],
+  },
+  {
+    id: 25,
+    name: "Wireless Bluetooth Speaker",
+    shortDescription:
+      "Portable waterproof Bluetooth speaker with 360-degree sound and LED lights.",
+    description: "Portable wireless speaker with impressive sound quality.",
+    longDescription:
+      "Experience music like never before with this Wireless Bluetooth Speaker featuring 360-degree surround sound and dynamic LED light show. The IPX7 waterproof rating makes it perfect for pool parties, beach trips, or outdoor adventures. With 12-hour battery life and quick charge capability, the music never stops. Advanced Bluetooth 5.0 ensures stable connection up to 100 feet away. The speaker includes built-in microphone for hands-free calls, TWS pairing for stereo sound, and customizable LED themes that sync with your music rhythm.",
+    price: 3200,
+    discount: 15,
+    discountedPrice: 2720.0,
+    category: "electronics",
+    subCategory: "audio",
+    isNewArrival: true,
+    hasDiscount: true,
+    flashSale: false,
+    stockQuantity: 20,
+    materials: ["Plastic", "Fabric", "Metal"],
+    images: {
+      primary: "https://i.ibb.co/B2TRtrZP/noimage.png",
+      detail: [
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+        "https://i.ibb.co/B2TRtrZP/noimage.png",
+      ],
+    },
+    variants: [
+      { size: "Compact", color: "Black", stock: 8 },
+      { size: "Compact", color: "Blue", stock: 6 },
+      { size: "Compact", color: "Red", stock: 4 },
+      { size: "Standard", color: "Black", stock: 2 },
+    ],
+  },
 ];
 
 module.exports = products;
