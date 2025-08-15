@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 const app = express();
 const connectDb = require("./db/connect");
 require("dotenv").config();
@@ -38,12 +39,28 @@ app.get("/", (req, res) => {
 });
 
 // Health check endpoint
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Server is healthy",
-    timestamp: new Date().toISOString(),
-  });
+app.get("/health", async (req, res) => {
+  try {
+    const Product = require("./models/product");
+    const productCount = await Product.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      message: "Server is healthy",
+      timestamp: new Date().toISOString(),
+      database: {
+        connected: mongoose.connection.readyState === 1,
+        productCount: productCount,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server health check failed",
+      timestamp: new Date().toISOString(),
+      error: error.message,
+    });
+  }
 });
 
 // 404 handler
@@ -69,6 +86,36 @@ const startServer = async () => {
   try {
     await connectDb(process.env.MONGO_URL);
     console.log("✅ Database connected successfully");
+
+    // Auto-seed database if empty (for production deployment)
+    const Product = require("./models/product");
+    const productCount = await Product.countDocuments();
+
+    if (productCount === 0) {
+      console.log("🌱 Database is empty, auto-seeding...");
+      try {
+        const { seedProducts } = require("./controllers/products");
+        // Create a mock response object
+        const mockRes = {
+          status: () => mockRes,
+          json: (data) => {
+            if (data.success) {
+              console.log(
+                `✅ Auto-seed completed: ${data.count} products added`,
+              );
+            } else {
+              console.error("❌ Auto-seed failed:", data.message);
+            }
+            return mockRes;
+          },
+        };
+        await seedProducts({}, mockRes);
+      } catch (seedError) {
+        console.error("❌ Auto-seed error:", seedError.message);
+      }
+    } else {
+      console.log(`📦 Database contains ${productCount} products`);
+    }
   } catch (error) {
     console.error("❌ Failed to connect to database:", error.message);
     process.exit(1);
