@@ -1,104 +1,160 @@
-# E-Commerce Server
+# E-Commerce Server API Documentation
 
-A complete Node.js e-commerce API server with MongoDB integration.
+## Overview
 
-## 🚀 Quick Start
+This is a comprehensive E-Commerce Server API built with Node.js, Express, and MongoDB. The server provides full CRUD operations for product management with advanced filtering, searching, and categorization features.
 
-### Prerequisites
 
-- Node.js (v16 or higher)
-- MongoDB Atlas account or local MongoDB
 
-### Installation
+## Base URL
 
-1. **Clone and install dependencies:**
-
-```bash
-npm install
+```
+http://localhost:5000
 ```
 
-2. **Seed the database:**
+## Authentication
 
-```bash
-npm run seed
-```
+Currently, no authentication is required for API access.
 
-3. **Start the server:**
+## Endpoints
 
-```bash
-npm start
-# or for development
-npm run dev
-```
+### Server Status
 
-Server runs on: `http://localhost:5000`
-
-## 📊 API Endpoints
+- **GET /** - Server information and available endpoints
+- **GET /health** - Health check endpoint
 
 ### Products
 
-- `GET /api/products/allProducts` - Get all products (with filtering & pagination)
-- `POST /api/products/createProduct` - Create a new product
-- `GET /api/products/:id` - Get product by ID
-- `PUT /api/products/:id` - Update product
-- `DELETE /api/products/:id` - Delete product
+#### Get All Products (No Pagination)
 
-### Categories
+```
+GET /api/products/allProducts
+```
 
-- `GET /api/products/categories` - Get all categories
-- `GET /api/products/categories/:category` - Get products by category
-- `GET /api/products/categories/:category/subcategories` - Get subcategories
+**Returns ALL products matching the specified filters - no pagination limits applied**
 
-### Special Endpoints
 
-- `GET /api/products/featured` - Get featured products
-- `GET /api/products/stats` - Get product statistics
-- `POST /api/products/seed` - Reseed database
 
-## 🔧 Available Scripts
+#### Get Product Statistics
 
-- `npm start` - Start production server
-- `npm run dev` - Start development server with nodemon
-- `npm run seed` - Seed database with sample data
+```
+GET /api/products/stats
+```
 
-## 📋 Features
+Returns comprehensive statistics about products in the database.
 
-- ✅ Complete CRUD operations
-- ✅ Advanced filtering and search
-- ✅ Pagination and sorting
-- ✅ Product categories and variants
-- ✅ Discount calculations
-- ✅ Inventory management
-- ✅ MongoDB integration with Mongoose
-- ✅ Error handling and validation
+#### Get Product Categories
 
-## 📖 Database
+```
+GET /api/products/categories
+```
 
-**Database:** `ecommerce`
-**Collection:** `all_products`
+Returns all available product categories.
 
-The server contains 25 sample products across 6 categories:
+#### Get Product Brands
 
-- Mens Fashion
-- Womens Fashion
-- Electronics
-- Baby
-- Kitchen
-- Sports
+```
+GET /api/products/brands
+```
 
-## 🌐 API Documentation
+Returns all available product brands.
 
-For detailed API documentation, see [API_DOCS.md](./API_DOCS.md)
+#### Get Featured Products
 
-## 📱 Example Usage
+```
+GET /api/products/featured
+```
+
+
+
+#### Get Products by Category
+
+```
+GET /api/products/categories/{category}
+```
+
+Returns all products in a specific category.
+
+#### Get Subcategories (Brands by Category)
+
+```
+GET /api/products/categories/{category}/subcategories
+```
+
+Returns all brands available in a specific category.
+
+#### Get Single Product
+
+```
+GET /api/products/{id}
+```
+
+Returns detailed information about a specific product.
+
+#### Create Product
+
+```
+POST /api/products/createProduct
+```
+
+Creates a new product. Requires all mandatory fields.
+
+#### Update Product
+
+```
+PUT /api/products/{id}
+```
+
+Updates an existing product.
+
+#### Delete Product
+
+```
+DELETE /api/products/{id}
+```
+
+Deletes a product from the database.
+
+#### Seed Database
+
+```
+POST /api/products/seed
+```
+
+Seeds the database with sample products data. **Caution**: This will clear all existing products.
+
+
+
+## Error Handling
+
+- **400** - Bad Request (validation errors)
+- **404** - Not Found (resource doesn't exist)
+- **500** - Internal Server Error
+
+## Examples
+
+### Get All Smartphones
 
 ```bash
-# Get all products
-curl http://localhost:5000/api/products/allProducts
-
-# Get products with filtering
-curl "http://localhost:5000/api/products/allProducts?category=electronics&hasDiscount=true"
-
-# Get statistics
-curl http://localhost:5000/api/products/stats
+curl "http://localhost:5000/api/products/allProducts?category=smartphone"
 ```
+
+### Search for Samsung Products
+
+```bash
+curl "http://localhost:5000/api/products/allProducts?search=Samsung"
+```
+
+### Get Discounted Products Under $1000
+
+```bash
+curl "http://localhost:5000/api/products/allProducts?isDiscount=true&maxPrice=1000"
+```
+
+### Get Product Statistics
+
+```bash
+curl "http://localhost:5000/api/products/stats"
+```
+
+

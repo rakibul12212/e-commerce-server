@@ -7,18 +7,18 @@ const {
   updateProduct,
   deleteProduct,
   seedProducts,
-  getAllProductsTesting,
   getCategories,
+  getBrands,
   getSubCategories,
   getProductsByCategory,
   getFeaturedProducts,
   getProductStats,
 } = require("../controllers/products");
 
-// Special routes (must come before parameterized routes)
-router.get("/allProducts", getAllProducts);
-router.get("/testing", getAllProductsTesting);
+// Main routes
+router.get("/allProducts", getAllProducts); // Returns ALL products matching filters (no pagination)
 router.get("/categories", getCategories);
+router.get("/brands", getBrands);
 router.get("/featured", getFeaturedProducts);
 router.get("/stats", getProductStats);
 router.post("/createProduct", createProduct);

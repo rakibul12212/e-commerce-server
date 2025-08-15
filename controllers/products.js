@@ -1,15 +1,17 @@
 const Product = require("../models/product");
 const products = require("../data/products-data");
 
-// Get all products with filtering, sorting, and pagination
+// Get all products with filtering and sorting (no pagination - returns all matching products)
 const getAllProducts = async (req, res) => {
   try {
     const {
       category,
-      subCategory,
-      hasDiscount,
-      isNewArrival,
-      flashSale,
+      brand,
+      isDiscount,
+      isLatest,
+      isFlashSale,
+      isFeature,
+      isBestSeller,
       minPrice,
       maxPrice,
       search,
@@ -21,10 +23,12 @@ const getAllProducts = async (req, res) => {
     const filter = {};
 
     if (category) filter.category = category.toLowerCase();
-    if (subCategory) filter.subCategory = subCategory.toLowerCase();
-    if (hasDiscount) filter.hasDiscount = hasDiscount === "true";
-    if (isNewArrival) filter.isNewArrival = isNewArrival === "true";
-    if (flashSale) filter.flashSale = flashSale === "true";
+    if (brand) filter.brand = new RegExp(brand, "i");
+    if (isDiscount) filter.isDiscount = isDiscount === "true";
+    if (isLatest) filter.isLatest = isLatest === "true";
+    if (isFlashSale) filter.isFlashSale = isFlashSale === "true";
+    if (isFeature) filter.isFeature = isFeature === "true";
+    if (isBestSeller) filter.isBestSeller = isBestSeller === "true";
 
     // Price range filter
     if (minPrice || maxPrice) {
@@ -37,10 +41,11 @@ const getAllProducts = async (req, res) => {
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
-        { shortDescription: { $regex: search, $options: "i" } },
-        { longDescription: { $regex: search, $options: "i" } },
+        { shortDetails: { $regex: search, $options: "i" } },
+        { longDetails: { $regex: search, $options: "i" } },
         { category: { $regex: search, $options: "i" } },
-        { subCategory: { $regex: search, $options: "i" } },
+        { brand: { $regex: search, $options: "i" } },
+        { model: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -48,23 +53,22 @@ const getAllProducts = async (req, res) => {
     const sortOptions = {};
     sortOptions[sort] = order === "desc" ? -1 : 1;
 
-    // Execute query
+    // Execute query - returns ALL matching products (no pagination)
     const allProducts = await Product.find(filter).sort(sortOptions);
-
-    // Get total count
-    const totalProducts = allProducts.length;
 
     res.status(200).json({
       success: true,
-      message: "Products fetched successfully",
+      message: `${allProducts.length} products fetched successfully`,
       data: allProducts,
-      totalProducts,
-      filters: {
+      count: allProducts.length,
+      appliedFilters: {
         category,
-        subCategory,
-        hasDiscount,
-        isNewArrival,
-        flashSale,
+        brand,
+        isDiscount,
+        isLatest,
+        isFlashSale,
+        isFeature,
+        isBestSeller,
         minPrice,
         maxPrice,
         search,
@@ -81,35 +85,39 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-// Testing endpoint
-const getAllProductsTesting = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "All testing products fetched successfully",
-  });
-};
-
 // Create a single product
 const createProduct = async (req, res) => {
   try {
     const productData = {
+      id: req.body.id,
       name: req.body.name,
       price: parseFloat(req.body.price) || 0,
-      shortDescription: req.body.shortDescription,
-      longDescription: req.body.longDescription,
+      discountPercent: parseFloat(req.body.discountPercent) || 0,
+      primaryImg: req.body.primaryImg,
+      detailsImg: req.body.detailsImg || [],
+      shortDetails: req.body.shortDetails,
+      longDetails: req.body.longDetails,
+      specifications: req.body.specifications || {},
       category: req.body.category,
-      subCategory: req.body.subCategory,
-      materials: req.body.materials,
-      hasDiscount: req.body.hasDiscount,
-      isNewArrival: req.body.isNewArrival,
-      flashSale: req.body.flashSale,
-      images: req.body.images,
-      discount: parseFloat(req.body.discount) || 0,
-      stockQuantity: req.body.stockQuantity,
-      variants:
-        req.body.variants?.filter(
-          (variant) => variant.size && variant.color && variant.stock,
-        ) || [],
+      categoryImg: req.body.categoryImg,
+      isStock: req.body.isStock !== undefined ? req.body.isStock : true,
+      isDiscount: req.body.isDiscount || false,
+      PID: req.body.PID,
+      SKU: req.body.SKU,
+      brand: req.body.brand,
+      model: req.body.model,
+      warranty: req.body.warranty || "1 year",
+      rating: parseFloat(req.body.rating) || 0,
+      isWarranty:
+        req.body.isWarranty !== undefined ? req.body.isWarranty : true,
+      stockQuantity: parseInt(req.body.stockQuantity) || 0,
+      isFeature: req.body.isFeature || false,
+      isFlashSale: req.body.isFlashSale || false,
+      isLatest: req.body.isLatest || false,
+      deals: req.body.deals,
+      isDeal: req.body.isDeal || false,
+      reviewCount: parseInt(req.body.reviewCount) || 0,
+      isBestSeller: req.body.isBestSeller || false,
     };
 
     const newProduct = await Product.create(productData);
@@ -134,8 +142,22 @@ const seedProducts = async (req, res) => {
     // Clear existing products
     await Product.deleteMany({});
 
+    // Transform the nested data structure to flat products array with categoryImg
+    const flatProducts = [];
+
+    for (const categoryData of products) {
+      for (const item of categoryData.items) {
+        // Add categoryImg to each product item
+        const productWithCategoryImg = {
+          ...item,
+          categoryImg: categoryData.categoryImg,
+        };
+        flatProducts.push(productWithCategoryImg);
+      }
+    }
+
     // Insert sample products from data file
-    const seededProducts = await Product.insertMany(products);
+    const seededProducts = await Product.insertMany(flatProducts);
 
     res.status(201).json({
       success: true,
@@ -252,23 +274,41 @@ const getCategories = async (req, res) => {
   }
 };
 
-// Get subcategories by category
+// Get product brands
+const getBrands = async (req, res) => {
+  try {
+    const brands = await Product.distinct("brand");
+    res.status(200).json({
+      success: true,
+      message: "Brands fetched successfully",
+      data: brands,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching brands",
+      error: error.message,
+    });
+  }
+};
+
+// Get subcategories by category (brands in this case)
 const getSubCategories = async (req, res) => {
   try {
     const { category } = req.params;
-    const subCategories = await Product.distinct("subCategory", {
+    const brands = await Product.distinct("brand", {
       category: category.toLowerCase(),
     });
     res.status(200).json({
       success: true,
-      message: "Subcategories fetched successfully",
-      data: subCategories,
+      message: "Brands fetched successfully",
+      data: brands,
       category: category,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error fetching subcategories",
+      message: "Error fetching brands",
       error: error.message,
     });
   }
@@ -298,20 +338,24 @@ const getProductsByCategory = async (req, res) => {
   }
 };
 
-// Get featured products (new arrivals, flash sales, discounted)
+// Get featured products (latest, flash sales, discounted)
 const getFeaturedProducts = async (req, res) => {
   try {
-    const newArrivals = await Product.find({ isNewArrival: true }).limit(6);
-    const flashSales = await Product.find({ flashSale: true }).limit(6);
-    const discounted = await Product.find({ hasDiscount: true }).limit(6);
+    const latest = await Product.find({ isLatest: true }).limit(6);
+    const flashSales = await Product.find({ isFlashSale: true }).limit(6);
+    const discounted = await Product.find({ isDiscount: true }).limit(6);
+    const featured = await Product.find({ isFeature: true }).limit(6);
+    const bestSellers = await Product.find({ isBestSeller: true }).limit(6);
 
     res.status(200).json({
       success: true,
       message: "Featured products fetched successfully",
       data: {
-        newArrivals,
+        latest,
         flashSales,
         discounted,
+        featured,
+        bestSellers,
       },
     });
   } catch (error) {
@@ -330,11 +374,17 @@ const getProductStats = async (req, res) => {
     const categoriesCount = await Product.distinct("category").then(
       (categories) => categories.length,
     );
-    const newArrivalsCount = await Product.countDocuments({
-      isNewArrival: true,
+    const brandsCount = await Product.distinct("brand").then(
+      (brands) => brands.length,
+    );
+    const latestCount = await Product.countDocuments({ isLatest: true });
+    const discountedCount = await Product.countDocuments({ isDiscount: true });
+    const flashSaleCount = await Product.countDocuments({ isFlashSale: true });
+    const featuredCount = await Product.countDocuments({ isFeature: true });
+    const bestSellersCount = await Product.countDocuments({
+      isBestSeller: true,
     });
-    const discountedCount = await Product.countDocuments({ hasDiscount: true });
-    const flashSaleCount = await Product.countDocuments({ flashSale: true });
+    const inStockCount = await Product.countDocuments({ isStock: true });
 
     res.status(200).json({
       success: true,
@@ -342,9 +392,13 @@ const getProductStats = async (req, res) => {
       data: {
         totalProducts,
         categoriesCount,
-        newArrivalsCount,
+        brandsCount,
+        latestCount,
         discountedCount,
         flashSaleCount,
+        featuredCount,
+        bestSellersCount,
+        inStockCount,
       },
     });
   } catch (error) {
@@ -358,13 +412,13 @@ const getProductStats = async (req, res) => {
 
 module.exports = {
   getAllProducts,
-  getAllProductsTesting,
   createProduct,
   seedProducts,
   getProductById,
   updateProduct,
   deleteProduct,
   getCategories,
+  getBrands,
   getSubCategories,
   getProductsByCategory,
   getFeaturedProducts,

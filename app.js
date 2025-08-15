@@ -85,6 +85,5 @@ module.exports = app;
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`🚀 Server is running on port ${port}`);
-    console.log(`📊 API Documentation: http://localhost:${port}`);
   });
 }

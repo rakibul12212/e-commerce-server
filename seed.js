@@ -13,8 +13,22 @@ const seedDatabase = async () => {
     await Product.deleteMany({});
     console.log("Existing products cleared...");
 
+    // Transform the nested data structure to flat products array with categoryImg
+    const flatProducts = [];
+
+    for (const categoryData of products) {
+      for (const item of categoryData.items) {
+        // Add categoryImg to each product item
+        const productWithCategoryImg = {
+          ...item,
+          categoryImg: categoryData.categoryImg,
+        };
+        flatProducts.push(productWithCategoryImg);
+      }
+    }
+
     // Insert sample products
-    const seededProducts = await Product.insertMany(products);
+    const seededProducts = await Product.insertMany(flatProducts);
     console.log(`✅ Successfully seeded ${seededProducts.length} products`);
 
     // Close connection

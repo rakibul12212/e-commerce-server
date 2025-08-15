@@ -1,40 +1,29 @@
 const mongoose = require("mongoose");
 
-const variantSchema = new mongoose.Schema({
-  size: {
-    type: String,
-    required: true,
-    trim: true,
+const specificationsSchema = new mongoose.Schema(
+  {
+    display: String,
+    processor: String,
+    ram: String,
+    storage: String,
+    camera: String,
+    battery: String,
+    os: String,
+    connectivity: String,
+    weight: String,
+    dimensions: String,
   },
-  color: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  stock: {
-    type: Number,
-    required: true,
-    min: 0,
-    default: 0,
-  },
-});
-
-const imagesSchema = new mongoose.Schema({
-  primary: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  detail: [
-    {
-      type: String,
-      trim: true,
-    },
-  ],
-});
+  { _id: false },
+);
 
 const productSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
     name: {
       type: String,
       required: [true, "Product name is required"],
@@ -47,61 +36,87 @@ const productSchema = new mongoose.Schema(
       min: [0, "Price cannot be negative"],
       default: 0,
     },
-    shortDescription: {
-      type: String,
-      required: [true, "Short description is required"],
-      trim: true,
-      maxlength: [500, "Short description cannot exceed 500 characters"],
+    discountPercent: {
+      type: Number,
+      min: [0, "Discount cannot be negative"],
+      max: [100, "Discount cannot exceed 100%"],
+      default: 0,
     },
-    longDescription: {
+    primaryImg: {
       type: String,
-      required: [true, "Long description is required"],
+      required: [true, "Primary image is required"],
       trim: true,
-      maxlength: [2000, "Long description cannot exceed 2000 characters"],
     },
+    detailsImg: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    shortDetails: {
+      type: String,
+      required: [true, "Short details is required"],
+      trim: true,
+      maxlength: [500, "Short details cannot exceed 500 characters"],
+    },
+    longDetails: {
+      type: String,
+      required: [true, "Long details is required"],
+      trim: true,
+      maxlength: [2000, "Long details cannot exceed 2000 characters"],
+    },
+    specifications: specificationsSchema,
     category: {
       type: String,
       required: [true, "Category is required"],
       trim: true,
       lowercase: true,
     },
-    subCategory: {
+    categoryImg: {
       type: String,
-      required: [true, "Sub-category is required"],
       trim: true,
-      lowercase: true,
     },
-    materials: [
-      {
-        type: String,
-        trim: true,
-      },
-    ],
-    hasDiscount: {
+    isStock: {
+      type: Boolean,
+      default: true,
+    },
+    isDiscount: {
       type: Boolean,
       default: false,
     },
-    isNewArrival: {
-      type: Boolean,
-      default: false,
+    PID: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    flashSale: {
-      type: Boolean,
-      default: false,
+    SKU: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    images: {
-      type: imagesSchema,
-      required: [true, "Product images are required"],
+    brand: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    discount: {
+    model: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    warranty: {
+      type: String,
+      default: "1 year",
+    },
+    rating: {
       type: Number,
-      min: [0, "Discount cannot be negative"],
-      max: [100, "Discount cannot exceed 100%"],
+      min: [0, "Rating cannot be negative"],
+      max: [5, "Rating cannot exceed 5"],
       default: 0,
     },
-    discountedPrice: {
-      type: Number,
-      min: [0, "Discounted price cannot be negative"],
+    isWarranty: {
+      type: Boolean,
+      default: true,
     },
     stockQuantity: {
       type: Number,
@@ -109,7 +124,35 @@ const productSchema = new mongoose.Schema(
       min: [0, "Stock quantity cannot be negative"],
       default: 0,
     },
-    variants: [variantSchema],
+    isFeature: {
+      type: Boolean,
+      default: false,
+    },
+    isFlashSale: {
+      type: Boolean,
+      default: false,
+    },
+    isLatest: {
+      type: Boolean,
+      default: false,
+    },
+    deals: {
+      type: String,
+      trim: true,
+    },
+    isDeal: {
+      type: Boolean,
+      default: false,
+    },
+    reviewCount: {
+      type: Number,
+      min: [0, "Review count cannot be negative"],
+      default: 0,
+    },
+    isBestSeller: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -120,8 +163,8 @@ const productSchema = new mongoose.Schema(
 
 // Pre-save middleware to calculate discounted price
 productSchema.pre("save", function (next) {
-  if (this.hasDiscount && this.discount > 0) {
-    this.discountedPrice = this.price * (1 - this.discount / 100);
+  if (this.isDiscount && this.discountPercent > 0) {
+    this.discountedPrice = this.price * (1 - this.discountPercent / 100);
   } else {
     this.discountedPrice = this.price;
   }
@@ -130,25 +173,33 @@ productSchema.pre("save", function (next) {
 
 // Virtual to get effective price (discounted or regular)
 productSchema.virtual("effectivePrice").get(function () {
-  return this.hasDiscount ? this.discountedPrice : this.price;
+  return this.isDiscount && this.discountPercent > 0
+    ? this.price * (1 - this.discountPercent / 100)
+    : this.price;
 });
 
 // Virtual to check if product is in stock
 productSchema.virtual("inStock").get(function () {
-  return this.stockQuantity > 0;
+  return this.isStock && this.stockQuantity > 0;
 });
 
 // Index for search optimization
 productSchema.index({
   name: "text",
-  shortDescription: "text",
-  longDescription: "text",
+  shortDetails: "text",
+  longDetails: "text",
+  brand: "text",
+  model: "text",
 });
-productSchema.index({ category: 1, subCategory: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ brand: 1 });
 productSchema.index({ price: 1 });
-productSchema.index({ isNewArrival: 1 });
-productSchema.index({ hasDiscount: 1 });
-productSchema.index({ flashSale: 1 });
+productSchema.index({ rating: 1 });
+productSchema.index({ isLatest: 1 });
+productSchema.index({ isDiscount: 1 });
+productSchema.index({ isFlashSale: 1 });
+productSchema.index({ isFeature: 1 });
+productSchema.index({ isBestSeller: 1 });
 
 const Product = mongoose.model("Product", productSchema, "all_products");
 
